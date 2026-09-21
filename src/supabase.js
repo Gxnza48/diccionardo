@@ -1,7 +1,9 @@
 import { createClient } from '@supabase/supabase-js';
 
-const url = import.meta.env.VITE_SUPABASE_URL;
-const key = import.meta.env.VITE_SUPABASE_ANON_KEY;
+// The anon key is safe to expose in a frontend. Environment variables override
+// these public fallbacks so the site also works on a first Vercel deploy.
+const url = import.meta.env.VITE_SUPABASE_URL || 'https://gpjcwuxupxiwpjmyrcmp.supabase.co';
+const key = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwamN3dXh1cHhpd3BqbXlyY21wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwMTE1MDgsImV4cCI6MjEwNTU4NzUwOH0.jf8Qzco9y6iAvGOL8X_nZ58iaFvOTZpD6HGJ00muK4Y';
 export const supabase = url && key ? createClient(url, key) : null;
 export const visitorId = () => {
   const stored = localStorage.getItem('diccionardo-visitor');
@@ -13,8 +15,10 @@ export const visitorId = () => {
 export async function registerVisit() {
   if (!supabase) return null;
   const fingerprint = visitorId();
-  await supabase.from('site_visits').upsert({ fingerprint, last_seen_at: new Date().toISOString() }, { onConflict: 'fingerprint' });
-  const { count } = await supabase.from('site_visits').select('*', { count: 'exact', head: true });
+  const { error: visitError } = await supabase.from('site_visits').upsert({ fingerprint, last_seen_at: new Date().toISOString() }, { onConflict: 'fingerprint' });
+  if (visitError) console.warn('Diccionardo visitas:', visitError.message);
+  const { count, error } = await supabase.from('site_visits').select('*', { count: 'exact', head: true });
+  if (error) console.warn('Diccionardo contador:', error.message);
   return count || 0;
 }
 export async function reactToWord(wordSlug, reaction) {
@@ -24,6 +28,7 @@ export async function reactToWord(wordSlug, reaction) {
 }
 export async function reactionTotals(slugs) {
   if (!supabase) return {};
-  const { data } = await supabase.from('word_reactions').select('word_slug,reaction').in('word_slug', slugs);
+  const { data, error } = await supabase.from('word_reactions').select('word_slug,reaction').in('word_slug', slugs);
+  if (error) console.warn('Diccionardo reacciones:', error.message);
   return (data || []).reduce((all, row) => { all[row.word_slug] ||= { likes: 0, dislikes: 0 }; all[row.word_slug][row.reaction === 1 ? 'likes' : 'dislikes']++; return all; }, {});
 }

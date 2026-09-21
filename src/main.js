@@ -62,7 +62,7 @@ function route() {
   document.querySelector('#share').onclick = async () => { try { await navigator.clipboard.writeText(location.href); document.querySelector('#share-status').textContent = 'Enlace copiado.'; } catch { document.querySelector('#share-status').textContent = `Copiá este enlace: ${location.href}`; } };
 }
 document.addEventListener('click', e => {
-  const reaction = e.target.closest('[data-react]'); if (reaction) { reactToWord(reaction.dataset.word, Number(reaction.dataset.react)).then(() => { reaction.classList.add('chosen'); }); return; }
+  const reaction = e.target.closest('[data-react]'); if (reaction) { reactToWord(reaction.dataset.word, Number(reaction.dataset.react)).then(saved => { if (saved) { reaction.classList.add('chosen'); reaction.querySelector('span').textContent = Number(reaction.querySelector('span').textContent) + 1; } }); return; }
   if (e.target.closest('.contribute')) showDialog('proposal');
   if (e.target.closest('[data-about]')) showDialog('about');
   if (e.target.closest('.random')) { const choices = words.filter(w => !w.sensitive && location.hash !== `#palabra/${w.slug}`); location.hash = `palabra/${choices[Math.floor(Math.random() * choices.length)].slug}`; }
@@ -89,4 +89,4 @@ document.querySelector('#proposal-form').addEventListener('submit', e => {
 });
 window.addEventListener('hashchange', route);
 render(); route();
-registerVisit().then(count => { if (count) document.querySelector('#visitor-count').textContent = `Visitas: ${count.toLocaleString('es-AR')}`; });
+registerVisit().then(count => { document.querySelector('#visitor-count').textContent = `Visitas: ${count.toLocaleString('es-AR')}`; });
