@@ -1,0 +1,21 @@
+name: Corregir una entrada
+description: Mejorá una definición, un ejemplo o una fuente.
+title: 'Corrección: '
+body:
+  - type: input
+    id: palabra
+    attributes:
+      label: Palabra a corregir
+    validations:
+      required: true
+  - type: textarea
+    id: correccion
+    attributes:
+      label: Corrección propuesta
+      description: Contanos qué está mal y cómo debería decir.
+    validations:
+      required: true
+  - type: input
+    id: fuente
+    attributes:
+      label: Fuente o clip de respaldo

@@ -1,0 +1,28 @@
+name: Proponer una palabra
+description: Sumá una expresión al diccionario de la Army.
+title: 'Palabra: '
+body:
+  - type: input
+    id: palabra
+    attributes:
+      label: Palabra
+    validations:
+      required: true
+  - type: textarea
+    id: significado
+    attributes:
+      label: Significado
+      description: Explicá cómo se usa dentro de la comunidad.
+    validations:
+      required: true
+  - type: textarea
+    id: ejemplo
+    attributes:
+      label: Ejemplo de uso
+    validations:
+      required: true
+  - type: input
+    id: fuente
+    attributes:
+      label: Clip o fuente
+      description: Si conocés una fuente, dejá el enlace. No incluyas datos personales.
