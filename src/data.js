@@ -1,10 +1,12 @@
+import { communityWords } from './community-words.js';
+
 export const sources = {
   filo: { title: 'Diccionario streamer · Filo News', url: 'https://www.filo.news/gaming/Diccionario-streamer-que-significan-las-expresiones-Nashe-Breo-insta-ido-Ndeah-y-de-rucula-20200720-0043.html' },
   pais: { title: 'El lenguaje que popularizó Coscu · El País', url: 'https://www.elpais.com.uy/domingo/insta-buenardo-o-de-ruta-el-lenguaje-adolescente-que-popularizo-coscu' },
   untref: { title: 'Diccionario Latinoamericano · UNTREF', url: 'https://diccionario.untref.edu.ar/buscar.php?p=nashe&q=1566' }
 };
 // Definitions and examples are original editorial text. A null source marks an entry to verify.
-export const words = [
+const initialWords = [
   { slug: 'buenardo', word: 'buenardo', syllables: 'bue · nar · do', kind: 'adjetivo', category: 'Clásicos', definition: 'Algo que está muy bueno. Un juego, un tema, una jugada o ese plan que salió mejor de lo esperado.', example: 'Este tema está buenardo, ponelo de nuevo.', note: 'Una de las expresiones más reconocibles del universo de la Army. El sufijo «-ardo» también aparece en otras palabras del chat.', source: 'filo', related: ['malardo', 'nashe', 'epicardovich'] },
   { slug: 'nashe', word: 'nashe', syllables: 'na · she', kind: 'interjección', category: 'Clásicos', definition: 'Una expresión de aprobación o entusiasmo. Se usa cuando algo está buenísimo o te sorprende para bien.', example: '¿Conseguiste entradas? Naaashe.', note: 'También vas a encontrar variantes como «nashi». Su sentido depende del tono y del contexto.', source: 'untref', related: ['buenardo', 'dou', 'nazi'] },
   { slug: 'dou', word: 'dou', syllables: 'dou', kind: 'interjección', category: 'Reacciones', definition: 'Un festejo en una sola palabra. Sale cuando una jugada, una noticia o un momento merece celebrarse.', example: '¡Ganamos la última ronda, dou!', note: 'Las vocales se pueden estirar: «douuu».', source: 'filo', related: ['nashe', 'buenardo'] },
@@ -20,7 +22,30 @@ export const words = [
   { slug: 'nazi', word: 'nazi', syllables: 'na · zi', kind: 'uso histórico', category: 'Archivo', definition: 'En una etapa de esta jerga se utilizó como una reacción de intensidad o aprobación. Es un uso polémico por el significado histórico de la palabra.', example: 'Se conserva como referencia histórica del vocabulario, sin proponer su uso.', note: 'Fuera de esa jerga designa al nazismo y a sus seguidores. La asociación con el régimen genocida motivó críticas y variantes como «nashe». Documentarlo no implica avalarlo.', source: 'filo', related: ['nashe'], sensitive: true }
 ];
 export const normalize = (text) => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+const slugify = (text) => normalize(text).replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+const kinds = { expresion: 'expresión', exclamacion: 'exclamación', comodin: 'comodín', deformacion: 'deformación' };
+const categories = { meme: 'Memes', gaming: 'Gaming', streaming: 'Gaming', internet: 'Internet', sufijo: 'Sufijos', vocativo: 'Apodos' };
+const mergedWords = new Map(initialWords.map(w => [slugify(w.word), w]));
+for (const entry of communityWords) {
+  const slug = slugify(entry.termino);
+  const existing = mergedWords.get(slug);
+  const metadata = { variants: entry.variantes, era: entry.epoca, suppliedOrigin: entry.origen };
+  if (existing) {
+    // Keep published links, examples and sourced definitions; enrich with the submitted metadata.
+    mergedWords.set(slug, { ...existing, ...metadata });
+  } else {
+    mergedWords.set(slug, {
+      slug, word: ['F', 'NT', 'KJJJ'].includes(entry.termino) ? entry.termino : entry.termino.toLowerCase(),
+      kind: kinds[entry.tipo] || entry.tipo,
+      category: categories[entry.tipo] || (entry.epoca === 'actual' ? 'Actuales' : entry.tipo === 'adjetivo' && entry.epoca === 'clasica' ? 'Clásicos' : 'Expresiones'),
+      definition: entry.significado, example: null, note: 'Entrada aportada al proyecto. Pendiente de fuente o clip de uso.',
+      source: null, related: [], ...metadata
+    });
+  }
+}
+export const words = [...mergedWords.values()];
+export const wordCategories = ['Todas', 'Clásicos', 'Reacciones', 'Expresiones', 'Actuales', 'Memes', 'Gaming', 'Internet', 'Sufijos', 'Apodos', 'Archivo'];
 export function findWords(query = '', category = 'Todas', letter = '') {
   const q = normalize(query);
-  return words.filter(w => (category === 'Todas' || w.category === category) && (!letter || normalize(w.word).startsWith(normalize(letter))) && normalize(`${w.word} ${w.definition}`).includes(q));
+  return words.filter(w => (category === 'Todas' || w.category === category) && (!letter || normalize(w.word).replace(/^-/, '').startsWith(normalize(letter))) && normalize(`${w.word} ${(w.variants || []).join(' ')} ${w.definition}`).includes(q));
 }

@@ -50,6 +50,7 @@ Proyecto independiente: no está afiliado ni aprobado por Coscu, Wikipedia ni Wi
 ## Estructura
 
 - `src/data.js`: palabras, referencias y búsqueda.
+- `src/community-words.js`: 70 términos aportados por el dueño del proyecto, con variantes, época y origen indicado. Se combinan por término normalizado con las entradas iniciales, sin duplicarlas. Los orígenes aportados se muestran como no verificados; las entradas nuevas no inventan ejemplos ni fuentes.
 - `src/main.js`: interfaz, navegación, filtros y propuestas.
 - `src/style.css`: diseño adaptable y estilos.
 - `.github/ISSUE_TEMPLATE/`: propuestas y correcciones.
