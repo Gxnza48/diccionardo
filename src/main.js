@@ -17,7 +17,7 @@ app.innerHTML = `
     <aside class="sidebar"><div class="side-title">NAVEGACIÓN</div><nav aria-label="Principal"><a href="#" class="side-link active">▤ <span>Portada</span></a><a href="#diccionario" class="side-link">Aa <span>Todas las palabras</span></a><button class="side-link random">⤨ <span>Palabra al azar</span></button><button class="side-link" data-about>◎ <span>La Coscu Army</span></button></nav>
       <div class="side-title community-title">Participar</div><button class="side-link contribute">+ <span>Sumar una palabra</span></button><a href="${repo}/issues" target="_blank" rel="noreferrer" class="side-link">↗ <span>Propuestas</span></a>
       <div class="web-badge" aria-label="Hecho en Argentina">HECHO EN<br><strong>ARGENTINA</strong></div>
-      <section class="sidebar-hall" aria-labelledby="sidebar-hall-title"><div class="sidebar-hall-title" id="sidebar-hall-title">Hall of Fame</div><img src="/hall-of-fame-zeko.png" alt="ZeKo" loading="lazy"><a href="#hall-of-fame">ZeKo</a><small>Foto de la Army</small></section>
+      <section class="sidebar-hall" aria-labelledby="sidebar-hall-title"><div class="sidebar-hall-title" id="sidebar-hall-title">Hall of Fame</div><div class="sidebar-hall-grid">${[['zeko','ZeKo'],['coscu','Coscu'],['momo','Momo'],['joaco','Joaco Lopez'],['pimpe','Pimpe'],['coker','Coker']].map(([slug,name]) => `<a class="hall-person" href="#hall-of-fame" title="${name}"><img src="/hall-of-fame-${slug}.png" alt="${name}" loading="lazy"><span>${name}</span></a>`).join('')}</div><small>Fotos de la Army</small></section>
     </aside>
     <main id="contenido">
       <div class="page-tabs"><span>Portada</span><button class="text-link contribute">Proponer una palabra</button></div>
