@@ -17,6 +17,7 @@ app.innerHTML = `
     <aside class="sidebar"><div class="side-title">NAVEGACIÓN</div><nav aria-label="Principal"><a href="#" class="side-link active">▤ <span>Portada</span></a><a href="#diccionario" class="side-link">Aa <span>Todas las palabras</span></a><button class="side-link random">⤨ <span>Palabra al azar</span></button><button class="side-link" data-about>◎ <span>La Coscu Army</span></button></nav>
       <div class="side-title community-title">Participar</div><button class="side-link contribute">+ <span>Sumar una palabra</span></button><a href="${repo}/issues" target="_blank" rel="noreferrer" class="side-link">↗ <span>Propuestas</span></a>
       <div class="web-badge" aria-label="Hecho en Argentina">HECHO EN<br><strong>ARGENTINA</strong></div>
+      <section class="sidebar-hall" aria-labelledby="sidebar-hall-title"><div class="sidebar-hall-title" id="sidebar-hall-title">Hall of Fame</div><img src="/hall-of-fame-zeko.png" alt="ZeKo" loading="lazy"><a href="#hall-of-fame">ZeKo</a><small>Foto de la Army</small></section>
     </aside>
     <main id="contenido">
       <div class="page-tabs"><span>Portada</span><button class="text-link contribute">Proponer una palabra</button></div>
@@ -28,7 +29,7 @@ app.innerHTML = `
       <div class="filters" aria-label="Categorías">${wordCategories.map((c, i) => `<button data-category="${c}" class="filter ${i === 0 ? 'selected' : ''}" aria-pressed="${i === 0}">${c}${i === 0 ? ` <span>${words.length}</span>` : ''}</button>`).join('')}</div>
       <div class="alphabet" aria-label="Filtrar por letra"><button class="selected" data-letter="" aria-pressed="true">Todas</button>${'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('').map(l => `<button data-letter="${l}" ${words.some(w => normalize(w.word).replace(/^-/, '').startsWith(l.toLowerCase())) ? '' : 'disabled'} aria-pressed="false">${l}</button>`).join('')}</div>
       <div id="results-status" class="sr-only" aria-live="polite"></div><div id="words" class="word-grid"></div><div class="dictionary-bottom"><span id="count"></span><button class="text-link random">Palabra al azar</button></div></section>
-      <section class="hall-of-fame" aria-labelledby="hall-title">
+      <section class="hall-of-fame" id="hall-of-fame" aria-labelledby="hall-title">
         <div class="hall-heading"><div><span class="hall-kicker">ARCHIVO VISUAL</span><h2 id="hall-title">Hall of Fame</h2></div><span class="hall-rule">01 / 01</span></div>
         <article class="hall-card"><img src="/hall-of-fame-zeko.png" alt="ZeKo, con trenzas largas, en una habitación" loading="lazy"><div class="hall-copy"><div class="hall-label">PRIMERA FIGURA ARCHIVADA</div><h3>ZeKo</h3><p>Una cara que ya es parte del imaginario de la Army. Esta sección queda abierta para sumar fotos, nombres y el lore de la comunidad.</p><div class="hall-credit"><strong>Foto:</strong> ZeKo <span>·</span> <strong>Redes:</strong> enlaces pendientes</div><p class="hall-note">Pasame sus perfiles exactos y los agrego acá sin inventar links.</p></div></article>
       </section>
