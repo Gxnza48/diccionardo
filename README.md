@@ -54,4 +54,4 @@ Proyecto independiente: no está afiliado ni aprobado por Coscu, Wikipedia ni Wi
 - `src/style.css`: diseño adaptable y estilos.
 - `.github/ISSUE_TEMPLATE/`: propuestas y correcciones.
 
-La tipografía se carga desde Google Fonts; si no está disponible se usan Georgia y Arial. No hay analítica ni rastreadores integrados.
+La interfaz usa Arial y Georgia del sistema, sin fuentes externas. No hay analítica ni rastreadores integrados.
