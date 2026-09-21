@@ -3,7 +3,7 @@ import { createClient } from '@supabase/supabase-js';
 // The anon key is safe to expose in a frontend. Environment variables override
 // these public fallbacks so the site also works on a first Vercel deploy.
 const url = import.meta.env.VITE_SUPABASE_URL || 'https://gpjcwuxupxiwpjmyrcmp.supabase.co';
-const key = import.meta.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImdwamN3dXh1cHhpd3BqbXlyY21wIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTAwMTE1MDgsImV4cCI6MjEwNTU4NzUwOH0.jf8Qzco9y6iAvGOL8X_nZ58iaFvOTZpD6HGJ00muK4Y';
+const key = import.meta.env.VITE_SUPABASE_ANON_KEY || 'sb_publishable_vr9WjrOJFZWiEkn8Gnyerg_nxAZNgZI';
 export const supabase = url && key ? createClient(url, key) : null;
 export const visitorId = () => {
   const stored = localStorage.getItem('diccionardo-visitor');
