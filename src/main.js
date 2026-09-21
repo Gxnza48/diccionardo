@@ -1,5 +1,6 @@
 import './style.css';
 import { words, sources, findWords, normalize, wordCategories } from './data.js';
+import { supabase, registerVisit, reactToWord, reactionTotals } from './supabase.js';
 
 const repo = 'https://github.com/Gxnza48/diccionardo';
 const icon = (name) => ({ search: '⌕', arrow: '↗', random: '⤨', plus: '+', book: '▤' })[name];
@@ -10,7 +11,7 @@ app.innerHTML = `
   <a class="skip" href="#contenido">Saltar al contenido</a>
   <header class="masthead">
     <a class="brand" href="#" aria-label="Diccionardo, portada"><img src="/diccionardo-logo.png" width="330" height="110" alt="Diccionardo"></a>
-    <div class="header-note">Diccionario de la Coscu Army<br><a href="#diccionario">${words.length} palabras</a></div>
+    <div class="header-note">Diccionario de la Coscu Army<br><a href="#diccionario">${words.length} palabras</a><br><span id="visitor-count">Visitas: —</span></div>
     <button class="button primary contribute">${icon('plus')} Proponer palabra</button>
   </header>
   <div class="layout">
@@ -41,9 +42,10 @@ app.innerHTML = `
 function render() {
   let result = findWords(query, category, letter);
   if (sort === 'az') result = [...result].sort((a, b) => a.word.localeCompare(b.word, 'es'));
-  document.querySelector('#words').innerHTML = result.length ? result.map(w => `<article class="word-card"><div class="word-meta">${w.kind}<span>${w.category === 'Archivo' ? 'USO HISTÓRICO' : w.source ? w.category : 'POR DOCUMENTAR'}</span></div><h3><a href="#palabra/${w.slug}">${w.word}<span>↗</span></a></h3><p>${w.definition}</p>${w.example ? `<div class="word-example">“${escape(w.example)}”</div>` : ''}</article>`).join('') : `<div class="empty"><h3>No se encontraron resultados.</h3><p>Probá otra búsqueda o ayudanos a sumarla.</p><button id="reset" class="button">Limpiar filtros</button><button class="button primary contribute">Proponer palabra ↗</button></div>`;
+  document.querySelector('#words').innerHTML = result.length ? result.map(w => `<article class="word-card"><div class="word-meta">${w.kind}<span>${w.category === 'Archivo' ? 'USO HISTÓRICO' : w.source ? w.category : 'POR DOCUMENTAR'}</span></div><h3><a href="#palabra/${w.slug}">${w.word}<span>↗</span></a></h3><p>${w.definition}</p>${w.example ? `<div class="word-example">“${escape(w.example)}”</div>` : ''}<div class="reactions"><button data-react="1" data-word="${w.slug}" aria-label="Me gusta ${w.word}">👍 <span>0</span></button><button data-react="-1" data-word="${w.slug}" aria-label="No me gusta ${w.word}">👎 <span>0</span></button></div></article>`).join('') : `<div class="empty"><h3>No se encontraron resultados.</h3><p>Probá otra búsqueda o ayudanos a sumarla.</p><button id="reset" class="button">Limpiar filtros</button><button class="button primary contribute">Proponer palabra ↗</button></div>`;
   document.querySelector('#count').textContent = `Mostrando ${result.length} de ${words.length} palabras`;
   document.querySelector('#results-status').textContent = `${result.length} palabras encontradas`;
+  reactionTotals(result.map(w => w.slug)).then(totals => result.forEach(w => { const card = document.querySelector(`[data-word="${w.slug}"]`)?.closest('.word-card'); const total = totals[w.slug] || {}; if (card) { card.querySelector('[data-react="1"] span').textContent = total.likes || 0; card.querySelector('[data-react="-1"] span').textContent = total.dislikes || 0; } }));
   document.querySelectorAll('[data-category]').forEach(b => { b.classList.toggle('selected', b.dataset.category === category); b.setAttribute('aria-pressed', b.dataset.category === category); });
   document.querySelectorAll('[data-letter]').forEach(b => { b.classList.toggle('selected', b.dataset.letter === letter); b.setAttribute('aria-pressed', b.dataset.letter === letter); });
 }
@@ -60,6 +62,7 @@ function route() {
   document.querySelector('#share').onclick = async () => { try { await navigator.clipboard.writeText(location.href); document.querySelector('#share-status').textContent = 'Enlace copiado.'; } catch { document.querySelector('#share-status').textContent = `Copiá este enlace: ${location.href}`; } };
 }
 document.addEventListener('click', e => {
+  const reaction = e.target.closest('[data-react]'); if (reaction) { reactToWord(reaction.dataset.word, Number(reaction.dataset.react)).then(() => { reaction.classList.add('chosen'); }); return; }
   if (e.target.closest('.contribute')) showDialog('proposal');
   if (e.target.closest('[data-about]')) showDialog('about');
   if (e.target.closest('.random')) { const choices = words.filter(w => !w.sensitive && location.hash !== `#palabra/${w.slug}`); location.hash = `palabra/${choices[Math.floor(Math.random() * choices.length)].slug}`; }
@@ -78,6 +81,7 @@ document.querySelector('#proposal-form').addEventListener('submit', e => {
   e.preventDefault(); const fd = new FormData(e.target);
   const values = Object.fromEntries([...fd].map(([k, v]) => [k, v.trim()]));
   if (!values.word || values.definition.length < 15 || !values.example) { document.querySelector('#proposal-status').textContent = 'Completá la palabra, una definición de al menos 15 caracteres y un ejemplo.'; return; }
+  if (supabase) { supabase.from('community_submissions').insert({ word: values.word, definition: values.definition, example: values.example, source: values.source || null }).then(({ error }) => { document.querySelector('#proposal-status').textContent = error ? 'No se pudo guardar. Probá de nuevo.' : 'Palabra enviada. Gracias por sumar al diccionario.'; if (!error) e.target.reset(); }); return; }
   const body = `### Palabra\n${values.word}\n\n### Significado\n${values.definition}\n\n### Ejemplo\n${values.example}\n\n### Fuente o clip\n${values.source || 'Pendiente de fuente'}\n\nPropuesta enviada desde Diccionardo.`;
   const url = `${repo}/issues/new?title=${encodeURIComponent('Palabra: ' + values.word)}&body=${encodeURIComponent(body)}`;
   const link = document.createElement('a'); link.href = url; link.target = '_blank'; link.rel = 'noopener noreferrer'; link.click();
@@ -85,3 +89,4 @@ document.querySelector('#proposal-form').addEventListener('submit', e => {
 });
 window.addEventListener('hashchange', route);
 render(); route();
+registerVisit().then(count => { if (count) document.querySelector('#visitor-count').textContent = `Visitas: ${count.toLocaleString('es-AR')}`; });

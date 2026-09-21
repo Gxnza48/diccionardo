@@ -41,6 +41,10 @@ Para aprobar una propuesta:
 
 Para un futuro envío sin cuenta de GitHub se necesitará un backend persistente con moderación y protección contra spam; esta primera versión usa GitHub deliberadamente para mantener el lanzamiento simple y sin servicios adicionales.
 
+## Supabase
+
+El esquema inicial para cargas automáticas, reacciones y visitas está en `supabase/schema.sql`. Ejecutalo en el SQL Editor de Supabase y configurá `VITE_SUPABASE_URL` y `VITE_SUPABASE_ANON_KEY` en Vercel. Nunca uses ni publiques una clave `service_role` en el navegador. Si esas variables no están configuradas, la interfaz conserva el modo anterior de propuestas y muestra reacciones sin persistencia.
+
 ## Contenido
 
 Las definiciones y ejemplos son redacción editorial propia. Los ejemplos no son citas atribuidas a Coscu. Las fuentes de referencia están enlazadas en cada entrada y en «Acerca del proyecto». Las entradas sin fuente están identificadas; no se afirma que todas las palabras hayan sido inventadas por Coscu. «Nazi» se documenta con contexto histórico y queda fuera de la selección aleatoria.
